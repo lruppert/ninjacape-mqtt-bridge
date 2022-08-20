@@ -1,6 +1,7 @@
 [serial]
-#device = /dev/ttyAMA0 # for RPi
-device = /dev/tty01 # for BBB
+# ttyAMA0 for RPi, tty01 for BBB
+#device = /dev/ttyAMA0
+device = /dev/tty01
 
 [mqtt]
 server = 127.0.0.1
