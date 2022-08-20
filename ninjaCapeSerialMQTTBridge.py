@@ -45,6 +45,7 @@ def on_connect(client, userdata, flags, rc):
         # rc 0 successful connect
         print("Connected")
     else:
+        print("Unable to connect. Error code %d" % rc)
         raise Exception
     # subscribe to the output MQTT messages
     output_mid = client.subscribe("ninjaCape/output/#")
@@ -119,11 +120,11 @@ if __name__ == "__main__":
 
     serialdev = config.get("serial", "device")
     broker = config.get("mqtt", "server")
-    port = config.get("mqtt", "port")
+    port = config.getint("mqtt", "port")
     tls = config.getboolean("mqtt", "tls")
 
     try:
-        username = config.get("mqtt", "user")
+        username = config.get("mqtt", "username")
         password = config.get("mqtt", "password")
         auth = True
     except configparser.NoOptionError:
