@@ -1,0 +1,10 @@
+[serial]
+#device = /dev/ttyAMA0 # for RPi
+device = /dev/tty01 # for BBB
+
+[mqtt]
+server = 127.0.0.1
+port = 1883
+tls = False
+# user = mqttuser
+# password = yoursecretpasswordhere
