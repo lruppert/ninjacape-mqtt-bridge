@@ -13,20 +13,30 @@
 import json
 import threading
 import time
+import configparser
 import serial
 import paho.mqtt.client as mqtt
 
 # Settings
-serialdev = '/dev/ttyO1'  # for BBB
-# serialdev = '/dev/ttyAMA0'  # for RPi
+DEFAULT_CONFIG = "ninjacape-mqtt-bridge.cfg"
 
-broker = "127.0.0.1"  # mqtt broker
-port = 1883  # mqtt broker port
+serialdev = None
+broker = None
+port = None
 
 debug = False  # set this to True for lots of prints
 
 # buffer of data to output to the serial port
 outputData = []
+
+
+#
+# This loads the config file defined in the default config path
+#
+def load_config(config_path):
+    parser = configparser.RawConfigParser()
+    parser.read(config_path)
+    return parser
 
 
 #  MQTT callbacks
@@ -104,50 +114,56 @@ def serial_read_and_publish(ser, mqttc):
 
 
 # MAIN PROGRAM START
-try:
-    print("Connecting... ", serialdev)
-    # connect to serial port
-    # timeout 0 for non-blocking. Set to None for blocking.
-    ser = serial.Serial(serialdev, 9600, timeout=None)
-except serial.serialutil.SerialException as e:
-    print("Failed to connect serial"+str(e))
-    # unable to continue with no serial input
-    raise SystemExit
+if __name__ == "__main__":
+    config = load_config(DEFAULT_CONFIG)
 
-try:
-    # create an mqtt client
-    mqttc = mqtt.Client("ninjaCape")
+    serialdev = config.get("serial", "device")
+    broker = config.get("mqtt", "server")
+    port = config.get("mqtt", "port")
 
-    # attach MQTT callbacks
-    mqttc.on_connect = on_connect
-    mqttc.on_publish = on_publish
-    mqttc.on_subscribe = on_subscribe
-    mqttc.on_message = on_message
-    mqttc.message_callback_add("ninjaCape/output/#", on_message_output)
+    try:
+        print("Connecting... ", serialdev)
+        # connect to serial port
+        # timeout 0 for non-blocking. Set to None for blocking.
+        ser = serial.Serial(serialdev, 9600, timeout=None)
+    except serial.serialutil.SerialException as serial_exception:
+        print("Failed to connect serial"+str(serial_exception))
+        # unable to continue with no serial input
+        raise SystemExit
 
-    # connect to broker
-    mqttc.connect(broker, port, 60)
+    try:
+        # create an mqtt client
+        mqttc = mqtt.Client("ninjaCape")
 
-    # start the mqttc client thread
-    mqttc.loop_start()
+        # attach MQTT callbacks
+        mqttc.on_connect = on_connect
+        mqttc.on_publish = on_publish
+        mqttc.on_subscribe = on_subscribe
+        mqttc.on_message = on_message
+        mqttc.message_callback_add("ninjaCape/output/#", on_message_output)
 
-    serial_thread = threading.Thread(target=serial_read_and_publish,
-                                     args=(ser, mqttc))
-    serial_thread.daemon = True
-    serial_thread.start()
+        # connect to broker
+        mqttc.connect(broker, port, 60)
 
-    while True:  # main thread
-        # writing to serial port if there is data available
-        if len(outputData) > 0:
-            # print("***data to OUTPUT:",mqtt_to_JSON_output(outputData[0]))
-            ser.write(mqtt_to_json_output(outputData.pop()))
+        # start the mqttc client thread
+        mqttc.loop_start()
 
-        time.sleep(0.5)
+        serial_thread = threading.Thread(target=serial_read_and_publish,
+                                         args=(ser, mqttc))
+        serial_thread.daemon = True
+        serial_thread.start()
 
-# handle app closure
-except KeyboardInterrupt:
-    print("Interrupt received")
-    cleanup()
-except RuntimeError:
-    print("uh-oh! time to die")
-    cleanup()
+        while True:  # main thread
+            # writing to serial port if there is data available
+            if len(outputData) > 0:
+                ser.write(mqtt_to_json_output(outputData.pop()))
+
+            time.sleep(0.5)
+
+    # handle app closure
+    except KeyboardInterrupt:
+        print("Interrupt received")
+        cleanup()
+    except RuntimeError:
+        print("uh-oh! time to die")
+        cleanup()
