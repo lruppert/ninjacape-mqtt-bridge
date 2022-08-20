@@ -120,6 +120,14 @@ if __name__ == "__main__":
     serialdev = config.get("serial", "device")
     broker = config.get("mqtt", "server")
     port = config.get("mqtt", "port")
+    tls = config.getboolean("mqtt", "tls")
+
+    try:
+        username = config.get("mqtt", "user")
+        password = config.get("mqtt", "password")
+        auth = True
+    except configparser.NoOptionError:
+        auth = False
 
     try:
         print("Connecting... ", serialdev)
@@ -141,6 +149,11 @@ if __name__ == "__main__":
         mqttc.on_subscribe = on_subscribe
         mqttc.on_message = on_message
         mqttc.message_callback_add("ninjaCape/output/#", on_message_output)
+
+        if tls:
+            mqttc.tls_set()
+        if auth:
+            mqttc.username_pw_set(username=username, password=password)
 
         # connect to broker
         mqttc.connect(broker, port, 60)

@@ -6,5 +6,5 @@ device = /dev/tty01 # for BBB
 server = 127.0.0.1
 port = 1883
 tls = False
-# user = mqttuser
+# username = mqttuser
 # password = yoursecretpasswordhere
