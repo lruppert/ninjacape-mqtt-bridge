@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 #
 # used to interface the NinjaCape to openHAB via MQTT
 # - reads data from serial port and publishes on MQTT client
@@ -32,7 +32,7 @@ outputData = []
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
     #rc 0 successful connect
-        print "Connected"
+        print("Connected")
     else:
         raise Exception
     #subscribe to the output MQTT messages
@@ -40,26 +40,26 @@ def on_connect(client, userdata, flags, rc):
  
 def on_publish(client, userdata, mid):
     if(debug):
-        print "Published. mid:", mid
+        print("Published. mid:", mid)
 
 def on_subscribe(client, userdata, mid, granted_qos):
     if(debug):
-        print "Subscribed. mid:", mid
+        print("Subscribed. mid:", mid)
 
 def on_message_output(client, userdata, msg):
     if(debug):
-        print "Output Data: ", msg.topic, "data:", msg.payload
+        print("Output Data: ", msg.topic, "data:", msg.payload)
     #add to outputData list
     outputData.append(msg)
 
 def on_message(client, userdata, message):
     if(debug):
-        print "Unhandled Message Received: ", message.topic, message.paylod        
+        print("Unhandled Message Received: ", message.topic, message.paylod)
 
 #called on exit
 #close serial, disconnect MQTT
 def cleanup():
-    print "Ending and cleaning up"
+    print("Ending and cleaning up")
     ser.close()
     mqttc.disconnect()
 
@@ -76,12 +76,12 @@ def serial_read_and_publish(ser, mqttc):
     while True:
         line = ser.readline() # this is blocking
         if(debug):
-            print "line to decode:",line
+            print("line to decode:",line)
         
         # split the JSON packet up here and publish on MQTT
         json_data = json.loads(line)
         if(debug):
-            print "json decoded:",json_data
+            print("json decoded:",json_data)
 
         try:
             device = str( json_data['DEVICE'][0]['D'] )
@@ -93,12 +93,12 @@ def serial_read_and_publish(ser, mqttc):
 
 ############ MAIN PROGRAM START
 try:
-    print "Connecting... ", serialdev
+    print("Connecting... ", serialdev)
     #connect to serial port
     ser = serial.Serial(serialdev, 9600, timeout=None) #timeout 0 for non-blocking. Set to None for blocking.
 
 except:
-    print "Failed to connect serial"
+    print("Failed to connect serial")
     #unable to continue with no serial input
     raise SystemExit
 
@@ -126,15 +126,15 @@ try:
     while True: # main thread
         #writing to serial port if there is data available
         if( len(outputData) > 0 ):
-            #print "***data to OUTPUT:",mqtt_to_JSON_output(outputData[0])
+            #print("***data to OUTPUT:",mqtt_to_JSON_output(outputData[0]))
             ser.write(mqtt_to_JSON_output(outputData.pop()))
         
         time.sleep(0.5)
 
 # handle app closure
 except (KeyboardInterrupt):
-    print "Interrupt received"
+    print("Interrupt received")
     cleanup()
 except (RuntimeError):
-    print "uh-oh! time to die"
+    print("uh-oh! time to die")
     cleanup()
