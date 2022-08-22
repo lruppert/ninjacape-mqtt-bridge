@@ -87,8 +87,8 @@ def mqtt_to_json_output(mqtt_message):
     json_data = ('{"DEVICE": [{"G":"0","V":0,"D":'
                  + topics[2]
                  + ',"DA":"'
-                 + mqtt_message.payload + '"}]})')
-    return json_data
+                 + mqtt_message.payload.decode('utf8') + '"}]}')
+    return json_data.encode()
 
 
 # thread for reading serial data and publishing to MQTT client
