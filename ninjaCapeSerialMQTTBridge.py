@@ -91,7 +91,7 @@ def mqtt_to_json_output(mqtt_message):
                  + mqtt_message.payload.decode('utf8') + '"}]}')
     try:
         encoded_payload = json_data.encode()
-    except Exception as e:
+    except UnicodeError as e:
         print("ERROR: %s (%s)" % (e.msg, json_data))
     return encoded_payload
 
