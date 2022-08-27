@@ -82,13 +82,18 @@ def cleanup():
 
 
 def mqtt_to_json_output(mqtt_message):
+    encoded_payload = None
     topics = mqtt_message.topic.split('/')
     # JSON message in ninjaCape form
     json_data = ('{"DEVICE": [{"G":"0","V":0,"D":'
                  + topics[2]
                  + ',"DA":"'
                  + mqtt_message.payload.decode('utf8') + '"}]}')
-    return json_data.encode()
+    try:
+        encoded_payload = json_data.encode()
+    except json.JSONDecodeError as e:
+        print("ERROR: %s (%s)" % (e.msg, json_data))
+    return encoded_payload
 
 
 # thread for reading serial data and publishing to MQTT client
