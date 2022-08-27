@@ -101,12 +101,17 @@ def serial_read_and_publish(ser, mqttc):
     ser.flushInput()
 
     while True:
+        json_data = None
         line = ser.readline()  # this is blocking
         if debug:
             print("line to decode:", line)
 
         # split the JSON packet up here and publish on MQTT
-        json_data = json.loads(line)
+        try:
+            json_data = json.loads(line)
+        except json.JSONDecodeError as e:
+            print("ERROR: %s (%s)" % (e.msg, line))
+
         if debug:
             print("json decoded:", json_data)
 
