@@ -152,7 +152,7 @@ if __name__ == "__main__":
 
     try:
         # create an mqtt client
-        mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1,"ninjaCape")
+        mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2,"ninjaCape")
 
         # attach MQTT callbacks
         mqttc.on_connect = on_connect
