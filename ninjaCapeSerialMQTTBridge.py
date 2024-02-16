@@ -40,35 +40,35 @@ def load_config(config_path):
 
 
 #  MQTT callbacks
-def on_connect(client, userdata, flags, rc):
-    if rc == 0:
-        # rc 0 successful connect
+def on_connect(client, userdata, flags, reason_code, properties):
+    if reason_code == 0:
+        # reason_code 0 successful connect
         print("Connected")
     else:
-        print("Unable to connect. Error code %d" % rc)
+        print("Unable to connect. Error code %d" % reason_code)
         raise Exception
     # subscribe to the output MQTT messages
     output_mid = client.subscribe("ninjaCape/output/#")
 
 
-def on_publish(client, userdata, mid):
+def on_publish(client, userdata, mid, reason_codes, properties):
     if debug:
         print("Published. mid:", mid)
 
 
-def on_subscribe(client, userdata, mid, granted_qos):
+def on_subscribe(client, userdata, mid, reason_codes, properties):
     if debug:
         print("Subscribed. mid:", mid)
 
 
-def on_message_output(client, userdata, msg):
+def on_message_output(client, userdata, msg, reason_codes, properties):
     if debug:
         print("Output Data: ", msg.topic, "data:", msg.payload)
     # add to outputData list
     outputData.append(msg)
 
 
-def on_message(client, userdata, message):
+def on_message(client, userdata, message, reason_codes, properties):
     if debug:
         print("Unhandled Message Received: ", message.topic, message.paylod)
 
@@ -152,7 +152,7 @@ if __name__ == "__main__":
 
     try:
         # create an mqtt client
-        mqttc = mqtt.Client("ninjaCape")
+        mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1,"ninjaCape")
 
         # attach MQTT callbacks
         mqttc.on_connect = on_connect
