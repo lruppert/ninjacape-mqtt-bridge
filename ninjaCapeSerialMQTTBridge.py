@@ -61,16 +61,16 @@ def on_subscribe(client, userdata, mid, reason_codes, properties):
         print("Subscribed. mid:", mid)
 
 
-def on_message_output(client, userdata, msg, reason_codes, properties):
+def on_message_output(client, userdata, msg):
     if debug:
         print("Output Data: ", msg.topic, "data:", msg.payload)
     # add to outputData list
     outputData.append(msg)
 
 
-def on_message(client, userdata, message, reason_codes, properties):
+def on_message(client, userdata, message):
     if debug:
-        print("Unhandled Message Received: ", message.topic, message.paylod)
+        print("Unhandled Message Received: ", message.topic, message.payload)
 
 
 # called on exit
