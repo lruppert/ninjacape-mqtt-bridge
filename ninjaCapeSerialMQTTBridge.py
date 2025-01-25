@@ -7,8 +7,8 @@
 # - uses the Python MQTT client from the Mosquitto project
 #   http://mosquitto.org (now in Paho)
 #
-# https://github.com/perrin7/ninjacape-mqtt-bridge
-# perrin7
+# https://github.com/lruppert/ninjacape-mqtt-bridge
+# lruppert, based on code by perrin7
 
 import json
 import threading
