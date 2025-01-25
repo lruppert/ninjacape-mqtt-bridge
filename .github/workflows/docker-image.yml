@@ -23,7 +23,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: image/
+          context: .
           push: true
           tags: ghcr.io/lruppert/ninjacape-mqtt-bridge:latest
           platforms: linux/arm/v6
