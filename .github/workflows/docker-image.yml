@@ -1,10 +1,10 @@
 ---
-name: container
+name: docker-image
 
 on:
   push:
     branches:
-      - 'main'
+      - 'master'
 
 jobs:
   build-and-push-image:
