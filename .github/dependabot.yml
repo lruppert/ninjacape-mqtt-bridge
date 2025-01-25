@@ -17,7 +17,7 @@ updates:
       - "lruppert"
 
   # Maintain dependencies for Python
-  - package-ecosystem: "python"
+  - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
